@@ -1,3 +1,5 @@
 resized.gif
 test.py
 generated.gif
+*.pyc
+__pycache__/
