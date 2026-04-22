@@ -3,3 +3,4 @@ test.py
 generated.gif
 *.pyc
 __pycache__/
+thresholds.txt
