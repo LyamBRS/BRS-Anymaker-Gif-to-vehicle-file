@@ -42,7 +42,7 @@ def resize_gif(path, width=None, height=None, aspect_ratio=None, save_path="resi
 
             # Process frames
             for frame in ImageSequence.Iterator(img):
-                frame = frame.convert("RGBA")
+                frame = frame.convert("L")
 
                 resized = frame.resize(
                     (target_width, target_height),

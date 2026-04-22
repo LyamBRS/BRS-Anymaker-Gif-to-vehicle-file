@@ -36,7 +36,8 @@ def _limit(type, amount):
 
 def print_options(print_function=B.note):
     section_header("Miscellaneous", print_function=print_function)
-    print_function(f"  {_long('help')}          {B.BLUE}Show this page")
+    print_function(f"  {_long('help')}  {B.BLUE}Show this page")
+    print_function(f"  {_long('debug')} {B.BLUE}Get debug gifs and text files")
 
     print_function(f"  {_short('p')}{B.GREY} {_long('path')} {_type('path')}")
     print_function(f"       {B.DIM}{B.BLUE}If the script can't find your Anymaker creation folder")
@@ -84,6 +85,9 @@ def print_options(print_function=B.note):
     print_function(f"       {B.DIM}{B.BLUE}if 2, a frame is skipped every 2 frames")
     print_function(f"       {B.DIM}{B.BLUE}Defaults to {B.BOLD}0")
     print_function(f"       {_limit('min', '0')} {_limit('max', '5')}")
+
+    print_function(f"  {_short('i')}{B.GREY} {_long('invert')}")
+    print_function(f"       {B.DIM}{B.BLUE}output indicators will be inverted")
 
 
     print_function("")
