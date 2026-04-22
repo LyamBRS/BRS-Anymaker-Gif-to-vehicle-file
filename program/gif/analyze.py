@@ -48,6 +48,10 @@ def gif_to_binary_array(gif_input, args, save_path="generated.gif"):
     preview_frames = []
     durations = []
 
+    invert = False
+    if args.invert is not None:
+        invert = True
+
     threshold = 50
     if args.threshold is not None:
         threshold = int(args.threshold)
@@ -67,6 +71,7 @@ def gif_to_binary_array(gif_input, args, save_path="generated.gif"):
 
         total_sum = 0
         total_pixels = 0
+        debug_frames = []
 
         for frame_index in count:
             BrLogs.note(
@@ -82,23 +87,35 @@ def gif_to_binary_array(gif_input, args, save_path="generated.gif"):
             width, height = gray.size
 
             frame_array = []
+            debug_frame = []
             preview_img = Image.new("1", (width, height))  # binary image
 
             for y in range(height):
                 row = []
+                debug_row = []
                 for x in range(width):
                     pixel = gray.getpixel((x, y))
-                    value = 1 if pixel >= threshold else 0
+                    if invert:
+                        value = 1 if pixel <= threshold else 0
+                    else:
+                        value = 1 if pixel >= threshold else 0
+
                     row.append(value)
+                    debug_row.append(pixel)
 
                     total_pixels += pixel
                     total_sum += 1
 
                     # write pixel to preview image
-                    preview_img.putpixel((x, y), 255 if value == 1 else 0)
+                    if invert:
+                        preview_img.putpixel((x, y), 255 if value == 0 else 0)
+                    else:
+                        preview_img.putpixel((x, y), 255 if value == 1 else 0)
 
+                debug_frame.append(debug_row)
                 frame_array.append(row)
 
+            debug_frames.append(debug_frame)
             frames_data.append(frame_array)
             preview_frames.append(preview_img)
 
@@ -108,6 +125,10 @@ def gif_to_binary_array(gif_input, args, save_path="generated.gif"):
     BrLogs.success("   - Binary frames created")
 
     BrLogs.info(f"   - {BrLogs.DIM}average threshold is: {BrLogs.NO_BOLD_NO_DIM}{BrLogs.BOLD}{total_pixels/total_sum}")
+
+    if args.debug is not None:
+        save_debug_txt("thresholds.txt", debug_frames)
+        BrLogs.warning(f"   - {BrLogs.BOLD}DEBUG{BrLogs.NO_BOLD_NO_DIM}{BrLogs.DIM} debug enabled. pixel thresholds exported to: {BrLogs.GREY}thresholds.txt")
 
     if save_path and preview_frames:
         preview_frames[0].save(
@@ -121,3 +142,20 @@ def gif_to_binary_array(gif_input, args, save_path="generated.gif"):
         BrLogs.success(f"   - Preview GIF saved: {BrLogs.DIM}{save_path}")
 
     return frames_data
+
+
+
+## Fuck ass gifs thresholds are annoying as fuck... ugh.
+def save_debug_txt(path, frames_debug_data):
+    with open(path, "w", encoding="utf-8") as f:
+        for fi, frame in enumerate(frames_debug_data):
+            f.write(f"FRAME {fi}\n")
+
+            # print(frame)
+            for row in frame:
+                # print(row)
+                f.write(" ".join(f"{px:<3}" for px in row))
+                f.write("\n")
+
+            f.write("\n\n")
+        f.close()
