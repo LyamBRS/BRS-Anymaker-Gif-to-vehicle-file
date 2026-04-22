@@ -354,6 +354,7 @@ def generate_meta(width, height):
 
 
 def generate_frame_script(frames_data, width, height, fps):
+
     lines = []
 
     if fps is None:
@@ -372,15 +373,14 @@ def generate_frame_script(frames_data, width, height, fps):
         for row in range(height):
             for col in range(width):
 
-                if frame[row][col] == prev[row][col]:
-                    continue  # NO CHANGE → skip
-
                 alias = f"l{row}_{col}"
-                state = "true" if frame[row][col] == 0 else "false"
+                state = "true" if frame[row][col] == 1 else "false"
+                prev_state = "true" if prev[row][col] == 1 else "false"
 
-                lines.append(
-                    f"\t\tin {alias}.is_illuminated = {state}"
-                )
+                if prev_state != state:
+                    lines.append(
+                        f"\t\tin {alias}.is_illuminated = {state}"
+                    )
 
         lines.append("\t}\n")
 
