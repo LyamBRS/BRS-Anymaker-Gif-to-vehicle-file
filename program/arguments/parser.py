@@ -16,9 +16,11 @@ def build_parser():
     parser.add_argument("-t", "--threshold", type=valid_int_range(1,255))
     parser.add_argument("-d", "--duration", type=valid_int_range(min_val=1))
     parser.add_argument("-s", "--skip", type=valid_int_range(min_val=1))
+    parser.add_argument("-i", "--invert", action="store_true")
 
     parser.add_argument("-n", "--name", type=valid_name)
 
     parser.add_argument("--help", action="store_true")
+    parser.add_argument("--debug", action="store_true")
 
     return parser
