@@ -23,7 +23,7 @@ def main(argv = None):
 
     width, height, frames = handle_gif(args)
     data, meta = handle_generator(width, height, frames, args)
-    handle_saving(data, meta, save_folder)
+    handle_saving(data, meta, save_folder, args)
 
 if __name__ == "__main__":
     main()
