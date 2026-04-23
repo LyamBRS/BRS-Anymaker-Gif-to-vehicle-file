@@ -1,7 +1,7 @@
 import sys
 from ..prints.debug import BrLogs
 
-def generate_grid(frames, width, height, fps, color_value=79):
+def generate_grid(frames, width, height, fps, durations, color_value=79):
     BrLogs.info(f"   - {BrLogs.DIM}{BrLogs.BLUE} Generating wall + indicators")
 
     # --- WALL CONSTANTS ---
@@ -14,8 +14,6 @@ def generate_grid(frames, width, height, fps, color_value=79):
     # Centering like your working examples
     z_min = int(-((width-1) // 2) + 3)
     z_max = z_min + (width-1)
-
-    ticks_per_frame = max(1, round(60/fps))
 
     # --- MICROCONTROLLER (fixed) ---
     DATA_PORT_ID = 3
@@ -94,7 +92,7 @@ def generate_grid(frames, width, height, fps, color_value=79):
                     "data_value": {
                         "_type": "s32",
                         "type": "type_s32",
-                        "data_value": ticks_per_frame * len(frames)
+                        "data_value": get_last_frame(frames, fps, durations)
                     }
                 },
                 {
@@ -106,7 +104,7 @@ def generate_grid(frames, width, height, fps, color_value=79):
                     }
                 }
             ],
-            "script": generate_script(frames, width, height, fps)
+            "script": generate_script(frames, width, height, fps, durations)
         },
         {
             "def": 3,
@@ -353,21 +351,26 @@ def generate_meta(width, height):
 
 
 
-def generate_frame_script(frames_data, width, height, fps):
+def generate_frame_script(frames_data, width, height, fps, durations):
 
     lines = []
 
-    if fps is None:
-        fps = 60
-
-    ticks_per_frame = max(1, round(60/fps))
+    if fps is not None:
+        ticks_per_frame = max(1, round(60/fps))
 
     # start with everything OFF
     prev = [[1 for _ in range(width)] for _ in range(height)]
 
     for f_idx, frame in enumerate(frames_data):
 
-        lines.append(f"\tif (var frames == {f_idx*ticks_per_frame})")
+        if fps is None:
+            ms = durations[f_idx]
+            frame_tick = int(ms * 60 / 1000)
+        else:
+            sys.exit()
+            frame_tick = f_idx*ticks_per_frame
+
+        lines.append(f"\tif (var frames == {frame_tick})")
         lines.append("\t{")
 
         for row in range(height):
@@ -389,11 +392,22 @@ def generate_frame_script(frames_data, width, height, fps):
 
     return "\n".join(lines)
 
-def generate_script(frames_data, width, height, fps):
-    ticks_per_frame = max(1, round(60/fps))
-    last_frame = len(frames_data) * ticks_per_frame
+def generate_script(frames_data, width, height, fps, durations):
 
-    BASE_SCRIPT = f"define var integer ticks\ndefine var integer last_frame\ndefine var integer frames\ndefine var integer ticks_per_frames\nvar ticks = 0\nvar last_frame = {last_frame}\nvar frames = 0\nvar ticks_per_frames = {ticks_per_frame}\non_tick\n{{\n\tvar frames = var frames + 1\n\tif (var frames > var last_frame)\n\t{{\n\t\tvar frames = 0\n\t}}\n"
-    frame_blocks = generate_frame_script(frames_data, width, height, fps)
+    last_frame = get_last_frame(frames_data, fps, durations)
+
+    BASE_SCRIPT = f"define var integer ticks\ndefine var integer last_frame\ndefine var integer frames\ndefine var integer ticks_per_frames\nvar ticks = 0\nvar last_frame = {last_frame}\nvar frames = 0\nvar ticks_per_frames = 0\non_tick\n{{\n\tvar frames = var frames + 1\n\tif (var frames > var last_frame)\n\t{{\n\t\tvar frames = 0\n\t}}\n"
+    frame_blocks = generate_frame_script(frames_data, width, height, fps, durations)
     script = BASE_SCRIPT + frame_blocks
     return script
+
+
+def get_last_frame(frames_data, fps, durations):
+    if fps is not None:
+        BrLogs.info(f"  - User predefined fps will be utilized: {BrLogs.BRIGHT_CYAN}{BrLogs.BOLD}{fps}")
+        ticks_per_frame = max(1, round(60/fps))
+        last_frame = len(frames_data) * ticks_per_frame
+    else:
+        total_duration = sum(durations)
+        last_frame = int(total_duration * 60 / 1000)
+    return last_frame

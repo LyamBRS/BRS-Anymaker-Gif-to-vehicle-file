@@ -18,6 +18,6 @@ def handle_gif(args):
     gif, width, height = resize_gif(path, target_width, target_height, target_aspect_ratio)
 
     BrLogs.new_step("Binary convertion")
-    frames = gif_to_binary_array(gif, args)
+    frames, durations = gif_to_binary_array(gif, args)
 
-    return width, height, frames
+    return width, height, frames, durations

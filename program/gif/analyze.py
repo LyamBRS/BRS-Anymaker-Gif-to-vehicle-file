@@ -115,7 +115,6 @@ def gif_to_binary_array(gif_input, args, save_path="generated.gif"):
             debug_frames.append(debug_frame)
             frames_data.append(frame_array)
             preview_frames.append(preview_img)
-
             durations.append(img.info.get("duration", 100))
 
     print("")
@@ -138,7 +137,7 @@ def gif_to_binary_array(gif_input, args, save_path="generated.gif"):
         )
         BrLogs.success(f"   - Preview GIF saved: {BrLogs.DIM}{save_path}")
 
-    return frames_data
+    return frames_data, durations
 
 
 

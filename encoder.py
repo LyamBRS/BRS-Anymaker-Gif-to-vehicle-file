@@ -13,16 +13,14 @@ def main(argv = None):
     print_header()
     args = handle_args(args=argv)
 
-    path = Path(sys.argv[1])
-
     BrLogs.new_step("Anymaker data gathering")
     appdata = get_appdata()
     save_folder = get_save_folder(appdata)
 
     BrLogs.success("Arguments validated")
 
-    width, height, frames = handle_gif(args)
-    data, meta = handle_generator(width, height, frames, args)
+    width, height, frames, durations = handle_gif(args)
+    data, meta = handle_generator(width, height, frames, args, durations)
     handle_saving(data, meta, save_folder, args)
 
 if __name__ == "__main__":
