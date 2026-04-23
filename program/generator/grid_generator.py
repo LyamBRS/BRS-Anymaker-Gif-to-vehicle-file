@@ -9,11 +9,11 @@ def generate_grid(frames, width, height, fps, color_value=79):
     X_INDICATOR = 6
 
     Y_MIN = 6
-    Y_MAX = Y_MIN + height
+    Y_MAX = Y_MIN + height-1
 
     # Centering like your working examples
-    z_min = int(-(width // 2) + 3)
-    z_max = z_min + width
+    z_min = int(-((width-1) // 2) + 3)
+    z_max = z_min + (width-1)
 
     ticks_per_frame = max(1, round(60/fps))
 
@@ -199,8 +199,8 @@ def generate_grid(frames, width, height, fps, color_value=79):
     Y_TOP = Y_MAX
     Z_LEFT = z_max
 
-    for row in range(height + 1):
-        for col in range(width + 1):
+    for row in range(height):
+        for col in range(width):
 
             y = Y_TOP - row
             z = Z_LEFT - col

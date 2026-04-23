@@ -50,7 +50,7 @@ def gif_to_binary_array(gif_input, args, save_path="generated.gif"):
 
     invert = False
     if args.invert is not None:
-        invert = True
+        invert = args.invert
 
     threshold = 50
     if args.threshold is not None:
@@ -95,10 +95,10 @@ def gif_to_binary_array(gif_input, args, save_path="generated.gif"):
                 debug_row = []
                 for x in range(width):
                     pixel = gray.getpixel((x, y))
+                    value = 1 if pixel <= threshold else 0
+                    
                     if invert:
-                        value = 1 if pixel <= threshold else 0
-                    else:
-                        value = 1 if pixel >= threshold else 0
+                        value = 1 - value
 
                     row.append(value)
                     debug_row.append(pixel)
@@ -107,10 +107,7 @@ def gif_to_binary_array(gif_input, args, save_path="generated.gif"):
                     total_sum += 1
 
                     # write pixel to preview image
-                    if invert:
-                        preview_img.putpixel((x, y), 255 if value == 0 else 0)
-                    else:
-                        preview_img.putpixel((x, y), 255 if value == 1 else 0)
+                    preview_img.putpixel((x, y), 255 if value == 1 else 0)
 
                 debug_frame.append(debug_row)
                 frame_array.append(row)
