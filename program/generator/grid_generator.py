@@ -358,6 +358,8 @@ def generate_frame_script(frames_data, width, height, fps, durations):
     if fps is not None:
         ticks_per_frame = max(1, round(60/fps))
 
+    frame_count = len(frames_data)
+
     # start with everything OFF
     prev = [[1 for _ in range(width)] for _ in range(height)]
 
@@ -380,7 +382,7 @@ def generate_frame_script(frames_data, width, height, fps, durations):
                 state = "true" if frame[row][col] == 1 else "false"
                 prev_state = "true" if prev[row][col] == 1 else "false"
 
-                if prev_state != state:
+                if (prev_state != state) or frame_count == 1:
                     lines.append(
                         f"\t\tin {alias}.is_illuminated = {state}"
                     )
